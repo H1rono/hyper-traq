@@ -6,6 +6,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .build();
     let req = hyper_traq::apis::users::GetUsers::new(false, None);
     let res = client.request(req).await?;
-    println!("{}", res);
+    println!("{:?}", res);
     Ok(())
 }

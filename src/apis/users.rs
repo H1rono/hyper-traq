@@ -2,11 +2,18 @@ use std::str::Utf8Error;
 
 use hyper::body::Bytes;
 use hyper::{Body, Method};
+use thiserror::Error as ThisError;
 
 use super::ApiRequest;
+use crate::models::Users;
 
-#[derive(Debug, Clone, Copy)]
-pub struct GetUsers;
+#[derive(Debug, ThisError)]
+pub enum Error {
+    #[error(transparent)]
+    Utf8(#[from] Utf8Error),
+    #[error(transparent)]
+    Serde(#[from] serde_json::Error),
+}
 
 #[derive(Debug, Clone, Default)]
 pub struct GetUsers {
@@ -24,9 +31,8 @@ impl GetUsers {
 }
 
 impl ApiRequest for GetUsers {
-    // TODO: parse response with serde_json
-    type Response = String;
-    type Error = Utf8Error;
+    type Response = Users;
+    type Error = Error;
 
     fn uri(&self) -> String {
         let uri = format!("/users?include-suspended={}", self.include_suspended);
@@ -47,6 +53,7 @@ impl ApiRequest for GetUsers {
 
     fn parse(&self, body: Bytes) -> Result<Self::Response, Self::Error> {
         let s = std::str::from_utf8(&body)?;
-        Ok(s.to_string())
+        let r = serde_json::from_str(s)?;
+        Ok(r)
     }
 }
