@@ -18,7 +18,7 @@ pub trait ApiRequest: Sync + Send + 'static {
     type Response: Sync + Send + 'static;
     type Error: StdError + Sync + Send + 'static;
 
-    fn uri(&self) -> &str;
+    fn uri(&self) -> String;
     fn method(&self) -> Method;
     fn body(&self) -> Body;
     fn parse(&self, body: Bytes) -> Result<Self::Response, Self::Error>;
