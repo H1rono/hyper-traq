@@ -58,7 +58,7 @@ pub struct UserDetail {
 }
 
 /// https://github.com/traPtitech/traQ/blob/bf768fc1d4ce1d5eb1575dd64f008f70f97087dd/router/v3/users.go#L347-L352
-#[derive(Debug, Clone, Deserialize, Serialize)]
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PatchUserRequest {
     pub display_name: Option<String>,
@@ -67,7 +67,7 @@ pub struct PatchUserRequest {
     pub state: Option<UserAccountState>,
 }
 
-#[derive(Debug, Clone, Deserialize, Serialize)]
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct MessageStamp {
     pub user_id: Uuid,
@@ -79,7 +79,7 @@ pub struct MessageStamp {
 
 pub type MessageStamps = Vec<MessageStamp>;
 
-#[derive(Debug, Clone, Deserialize, Serialize)]
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Message {
     pub id: Uuid,
@@ -93,7 +93,7 @@ pub struct Message {
     pub thread_id: Option<Uuid>,
 }
 
-#[derive(Debug, Clone, Deserialize, Serialize)]
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PostMessageRequest {
     pub content: String,
