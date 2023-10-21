@@ -3,9 +3,10 @@ use std::str::Utf8Error;
 use hyper::body::Bytes;
 use hyper::{Body, Method};
 use thiserror::Error as ThisError;
+use uuid::Uuid;
 
 use super::ApiRequest;
-use crate::models::Users;
+use crate::models::{User, Users};
 
 #[derive(Debug, ThisError)]
 pub enum Error {
@@ -41,6 +42,40 @@ impl ApiRequest for GetUsers {
         } else {
             uri
         }
+    }
+
+    fn method(&self) -> Method {
+        Method::GET
+    }
+
+    fn body(&self) -> Body {
+        Body::empty()
+    }
+
+    fn parse(&self, body: Bytes) -> Result<Self::Response, Self::Error> {
+        let s = std::str::from_utf8(&body)?;
+        let r = serde_json::from_str(s)?;
+        Ok(r)
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct GetUser {
+    id: Uuid,
+}
+
+impl GetUser {
+    pub fn new(id: Uuid) -> Self {
+        Self { id }
+    }
+}
+
+impl ApiRequest for GetUser {
+    type Response = User;
+    type Error = Error;
+
+    fn uri(&self) -> String {
+        format!("/users/{}", self.id)
     }
 
     fn method(&self) -> Method {
