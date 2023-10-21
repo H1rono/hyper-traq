@@ -6,7 +6,7 @@ use thiserror::Error as ThisError;
 use uuid::Uuid;
 
 use super::ApiRequest;
-use crate::models::{User, Users};
+use crate::models::{User, UserTags, Users};
 
 #[derive(Debug, ThisError)]
 pub enum Error {
@@ -76,6 +76,40 @@ impl ApiRequest for GetUser {
 
     fn uri(&self) -> String {
         format!("/users/{}", self.id)
+    }
+
+    fn method(&self) -> Method {
+        Method::GET
+    }
+
+    fn body(&self) -> Body {
+        Body::empty()
+    }
+
+    fn parse(&self, body: Bytes) -> Result<Self::Response, Self::Error> {
+        let s = std::str::from_utf8(&body)?;
+        let r = serde_json::from_str(s)?;
+        Ok(r)
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct GetUserTags {
+    id: Uuid,
+}
+
+impl GetUserTags {
+    pub fn new(id: Uuid) -> Self {
+        Self { id }
+    }
+}
+
+impl ApiRequest for GetUserTags {
+    type Response = UserTags;
+    type Error = Error;
+
+    fn uri(&self) -> String {
+        format!("/users/{}/tags", self.id)
     }
 
     fn method(&self) -> Method {

@@ -36,6 +36,8 @@ pub struct UserTag {
     pub updated_at: String,
 }
 
+pub type UserTags = Vec<UserTag>;
+
 /// https://github.com/traPtitech/traQ/blob/bf768fc1d4ce1d5eb1575dd64f008f70f97087dd/router/v3/responses.go#L110-L124
 #[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -49,7 +51,7 @@ pub struct UserDetail {
     pub twitter_id: String,
     pub last_online: Option<String>,
     pub updated_at: String,
-    pub tags: Vec<UserTag>,
+    pub tags: UserTags,
     pub groups: Vec<Uuid>,
     pub bio: String,
     pub home_channel: Option<Uuid>,
