@@ -152,9 +152,13 @@ impl ApiRequest for PatchUser {
         Method::PATCH
     }
 
+    fn content_type(&self) -> Option<String> {
+        Some("application/json".to_string())
+    }
+
     fn body(&self) -> Body {
         serde_json::to_string(&self.request)
-            .expect("failed to parse PatchUserRequest")
+            .expect("failed to serialize PatchUserRequest")
             .into()
     }
 

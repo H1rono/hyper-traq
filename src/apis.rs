@@ -20,6 +20,9 @@ pub trait ApiRequest: Sync + Send + 'static {
 
     fn uri(&self) -> String;
     fn method(&self) -> Method;
+    fn content_type(&self) -> Option<String> {
+        None
+    }
     fn body(&self) -> Body;
     fn parse(&self, body: Bytes) -> Result<Self::Response, Self::Error>;
 }
@@ -46,6 +49,12 @@ impl Client {
         let req_builder = Request::builder().method(req.method()).uri(uri);
         let req_builder = if let Authorization::Bearer(bearer) = &self.authorization {
             req_builder.header(AUTHORIZATION, format!("Bearer {}", bearer))
+        } else {
+            req_builder
+        };
+        let req_builder = if let Some(content_type) = req.content_type() {
+            use hyper::header::CONTENT_TYPE;
+            req_builder.header(CONTENT_TYPE, content_type)
         } else {
             req_builder
         };
