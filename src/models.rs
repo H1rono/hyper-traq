@@ -66,3 +66,36 @@ pub struct PatchUserRequest {
     pub role: Option<String>,
     pub state: Option<UserAccountState>,
 }
+
+#[derive(Debug, Clone, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct MessageStamp {
+    pub user_id: Uuid,
+    pub stamp_id: Uuid,
+    pub count: u32,
+    pub crated_at: String,
+    pub updated_at: String,
+}
+
+pub type MessageStamps = Vec<MessageStamp>;
+
+#[derive(Debug, Clone, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Message {
+    pub id: Uuid,
+    pub user_id: Uuid,
+    pub channel_id: Uuid,
+    pub content: String,
+    pub created_at: String,
+    pub updated_at: String,
+    pub pinned: bool,
+    pub stamps: MessageStamps,
+    pub thread_id: Option<Uuid>,
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct PostMessageRequest {
+    pub content: String,
+    pub embed: bool,
+}

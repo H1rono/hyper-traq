@@ -6,7 +6,7 @@ use thiserror::Error as ThisError;
 use uuid::Uuid;
 
 use super::ApiRequest;
-use crate::models::{PatchUserRequest, User, UserTags, Users};
+use crate::models::{Message, PatchUserRequest, PostMessageRequest, User, UserTags, Users};
 
 #[derive(Debug, ThisError)]
 pub enum Error {
@@ -164,5 +164,46 @@ impl ApiRequest for PatchUser {
 
     fn parse(&self, _body: Bytes) -> Result<Self::Response, Self::Error> {
         Ok(())
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct PostDirectMessage {
+    id: Uuid,
+    request: PostMessageRequest,
+}
+
+impl PostDirectMessage {
+    pub fn new(id: Uuid, request: PostMessageRequest) -> Self {
+        Self { id, request }
+    }
+}
+
+impl ApiRequest for PostDirectMessage {
+    type Response = Message;
+    type Error = Error;
+
+    fn uri(&self) -> String {
+        format!("/users/{}/messages", self.id)
+    }
+
+    fn method(&self) -> Method {
+        Method::POST
+    }
+
+    fn content_type(&self) -> Option<String> {
+        Some("application/json".to_string())
+    }
+
+    fn body(&self) -> Body {
+        serde_json::to_string(&self.request)
+            .expect("failed to serialize PostMessageRequest")
+            .into()
+    }
+
+    fn parse(&self, body: Bytes) -> Result<Self::Response, Self::Error> {
+        let s = std::str::from_utf8(&body)?;
+        let r = serde_json::from_str(s)?;
+        Ok(r)
     }
 }
