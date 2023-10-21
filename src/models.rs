@@ -56,3 +56,13 @@ pub struct UserDetail {
     pub bio: String,
     pub home_channel: Option<Uuid>,
 }
+
+/// https://github.com/traPtitech/traQ/blob/bf768fc1d4ce1d5eb1575dd64f008f70f97087dd/router/v3/users.go#L347-L352
+#[derive(Debug, Clone, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct PatchUserRequest {
+    pub display_name: Option<String>,
+    pub twitter_id: Option<String>,
+    pub role: Option<String>,
+    pub state: Option<UserAccountState>,
+}

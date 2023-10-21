@@ -6,7 +6,7 @@ use thiserror::Error as ThisError;
 use uuid::Uuid;
 
 use super::ApiRequest;
-use crate::models::{User, UserTags, Users};
+use crate::models::{PatchUserRequest, User, UserTags, Users};
 
 #[derive(Debug, ThisError)]
 pub enum Error {
@@ -124,5 +124,41 @@ impl ApiRequest for GetUserTags {
         let s = std::str::from_utf8(&body)?;
         let r = serde_json::from_str(s)?;
         Ok(r)
+    }
+}
+
+/// maybe works
+#[derive(Debug, Clone)]
+pub struct PatchUser {
+    id: Uuid,
+    request: PatchUserRequest,
+}
+
+impl PatchUser {
+    pub fn new(id: Uuid, request: PatchUserRequest) -> Self {
+        Self { id, request }
+    }
+}
+
+impl ApiRequest for PatchUser {
+    type Response = ();
+    type Error = std::convert::Infallible;
+
+    fn uri(&self) -> String {
+        format!("/users/{}", self.id)
+    }
+
+    fn method(&self) -> Method {
+        Method::PATCH
+    }
+
+    fn body(&self) -> Body {
+        serde_json::to_string(&self.request)
+            .expect("failed to parse PatchUserRequest")
+            .into()
+    }
+
+    fn parse(&self, _body: Bytes) -> Result<Self::Response, Self::Error> {
+        Ok(())
     }
 }
