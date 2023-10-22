@@ -101,3 +101,19 @@ pub struct PostMessageRequest {
     pub content: String,
     pub embed: bool,
 }
+
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct UserStatsStamp {
+    pub id: Uuid,
+    pub count: i64,
+    pub total: i64,
+}
+
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct UserStats {
+    pub total_message_count: i64,
+    pub stamps: Vec<UserStatsStamp>,
+    pub datetime: String,
+}

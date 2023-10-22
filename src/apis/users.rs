@@ -8,7 +8,7 @@ use uuid::Uuid;
 
 use super::ApiRequest;
 use crate::models::{
-    Message, Messages, PatchUserRequest, PostMessageRequest, User, UserTags, Users,
+    Message, Messages, PatchUserRequest, PostMessageRequest, User, UserStats, UserTags, Users,
 };
 
 #[derive(Debug, ThisError)]
@@ -311,6 +311,40 @@ impl ApiRequest for GetDirectMessages {
             .map(|(k, v)| format!("{}={}", k, v))
             .join("&");
         format!("{}?{}", s, query)
+    }
+
+    fn method(&self) -> Method {
+        Method::GET
+    }
+
+    fn body(&self) -> Body {
+        Body::empty()
+    }
+
+    fn parse(&self, body: Bytes) -> Result<Self::Response, Self::Error> {
+        let s = std::str::from_utf8(&body)?;
+        let r = serde_json::from_str(s)?;
+        Ok(r)
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct GetUserStats {
+    id: Uuid,
+}
+
+impl GetUserStats {
+    pub fn new(id: Uuid) -> Self {
+        Self { id }
+    }
+}
+
+impl ApiRequest for GetUserStats {
+    type Response = UserStats;
+    type Error = Error;
+
+    fn uri(&self) -> String {
+        format!("/users/{}/stats", self.id)
     }
 
     fn method(&self) -> Method {
