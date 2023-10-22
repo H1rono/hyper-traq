@@ -2,11 +2,14 @@ use std::str::Utf8Error;
 
 use hyper::body::Bytes;
 use hyper::{Body, Method};
+use itertools::Itertools;
 use thiserror::Error as ThisError;
 use uuid::Uuid;
 
 use super::ApiRequest;
-use crate::models::{Message, PatchUserRequest, PostMessageRequest, User, UserTags, Users};
+use crate::models::{
+    Message, Messages, PatchUserRequest, PostMessageRequest, User, UserTags, Users,
+};
 
 #[derive(Debug, ThisError)]
 pub enum Error {
@@ -199,6 +202,123 @@ impl ApiRequest for PostDirectMessage {
         serde_json::to_string(&self.request)
             .expect("failed to serialize PostMessageRequest")
             .into()
+    }
+
+    fn parse(&self, body: Bytes) -> Result<Self::Response, Self::Error> {
+        let s = std::str::from_utf8(&body)?;
+        let r = serde_json::from_str(s)?;
+        Ok(r)
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct GetDirectMessages {
+    id: Uuid,
+    limit: Option<u32>,
+    offset: Option<u32>,
+    since: Option<String>,
+    until: Option<String>,
+    inclusive: Option<bool>,
+    order: Option<String>,
+}
+
+impl GetDirectMessages {
+    pub fn new(id: Uuid) -> Self {
+        Self {
+            id,
+            limit: None,
+            offset: None,
+            since: None,
+            until: None,
+            inclusive: None,
+            order: None,
+        }
+    }
+
+    pub fn set_limit(self, limit: u32) -> Self {
+        Self {
+            limit: Some(limit),
+            ..self
+        }
+    }
+
+    pub fn set_offset(self, offset: u32) -> Self {
+        Self {
+            offset: Some(offset),
+            ..self
+        }
+    }
+
+    pub fn set_since(self, since: &str) -> Self {
+        Self {
+            since: Some(since.to_string()),
+            ..self
+        }
+    }
+
+    pub fn set_until(self, until: &str) -> Self {
+        Self {
+            until: Some(until.to_string()),
+            ..self
+        }
+    }
+
+    pub fn set_inclusive(self, inclusive: bool) -> Self {
+        Self {
+            inclusive: Some(inclusive),
+            ..self
+        }
+    }
+
+    pub fn set_order(self, order: &str) -> Self {
+        Self {
+            order: Some(order.to_string()),
+            ..self
+        }
+    }
+}
+
+impl ApiRequest for GetDirectMessages {
+    type Response = Messages;
+    type Error = Error;
+
+    fn uri(&self) -> String {
+        let mut query: Vec<(&str, String)> = vec![];
+        if let Some(limit) = self.limit {
+            query.push(("limit", limit.to_string()));
+        }
+        if let Some(offset) = self.offset {
+            query.push(("offset", offset.to_string()));
+        }
+        if let Some(since) = &self.since {
+            query.push(("since", since.clone()));
+        }
+        if let Some(until) = &self.until {
+            query.push(("until", until.clone()))
+        }
+        if let Some(inclusive) = self.inclusive {
+            query.push(("inclusive", inclusive.to_string()));
+        }
+        if let Some(order) = &self.order {
+            query.push(("order", order.clone()));
+        }
+        let s = format!("/users/{}/messages", self.id);
+        if query.is_empty() {
+            return s;
+        }
+        let query = query
+            .into_iter()
+            .map(|(k, v)| format!("{}={}", k, v))
+            .join("&");
+        format!("{}?{}", s, query)
+    }
+
+    fn method(&self) -> Method {
+        Method::GET
+    }
+
+    fn body(&self) -> Body {
+        Body::empty()
     }
 
     fn parse(&self, body: Bytes) -> Result<Self::Response, Self::Error> {

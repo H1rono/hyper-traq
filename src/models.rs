@@ -93,6 +93,8 @@ pub struct Message {
     pub thread_id: Option<Uuid>,
 }
 
+pub type Messages = Vec<Message>;
+
 #[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PostMessageRequest {
