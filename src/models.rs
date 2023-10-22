@@ -73,7 +73,7 @@ pub struct MessageStamp {
     pub user_id: Uuid,
     pub stamp_id: Uuid,
     pub count: u32,
-    pub crated_at: String,
+    pub created_at: String,
     pub updated_at: String,
 }
 
