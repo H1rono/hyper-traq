@@ -1,7 +1,9 @@
+use std::io::Error as IoError;
 use std::str::Utf8Error;
 
 use hyper::body::Bytes;
 use hyper::{Body, Method};
+use image::ImageError;
 use itertools::Itertools;
 use thiserror::Error as ThisError;
 use uuid::Uuid;
@@ -14,9 +16,13 @@ use crate::models::{
 #[derive(Debug, ThisError)]
 pub enum Error {
     #[error(transparent)]
+    Io(#[from] IoError),
+    #[error(transparent)]
     Utf8(#[from] Utf8Error),
     #[error(transparent)]
     Serde(#[from] serde_json::Error),
+    #[error(transparent)]
+    Image(#[from] ImageError),
 }
 
 #[derive(Debug, Clone, Default)]
