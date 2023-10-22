@@ -1,3 +1,4 @@
+use image::DynamicImage;
 use serde::{Deserialize, Serialize};
 use serde_repr::{Deserialize_repr, Serialize_repr};
 use uuid::Uuid;
@@ -117,3 +118,5 @@ pub struct UserStats {
     pub stamps: Vec<UserStatsStamp>,
     pub datetime: String,
 }
+
+pub type Image = DynamicImage;

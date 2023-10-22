@@ -10,7 +10,8 @@ use uuid::Uuid;
 
 use super::ApiRequest;
 use crate::models::{
-    Message, Messages, PatchUserRequest, PostMessageRequest, User, UserStats, UserTags, Users,
+    Image, Message, Messages, PatchUserRequest, PostMessageRequest, User, UserStats, UserTags,
+    Users,
 };
 
 #[derive(Debug, ThisError)]
@@ -365,5 +366,43 @@ impl ApiRequest for GetUserStats {
         let s = std::str::from_utf8(&body)?;
         let r = serde_json::from_str(s)?;
         Ok(r)
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct GetUserIcon {
+    id: Uuid,
+}
+
+impl GetUserIcon {
+    pub fn new(id: Uuid) -> Self {
+        Self { id }
+    }
+}
+
+impl ApiRequest for GetUserIcon {
+    type Response = Image;
+    type Error = Error;
+
+    fn uri(&self) -> String {
+        format!("/users/{}/icon", self.id)
+    }
+
+    fn method(&self) -> Method {
+        Method::GET
+    }
+
+    fn body(&self) -> Body {
+        Body::empty()
+    }
+
+    fn parse(&self, body: Bytes) -> Result<Self::Response, Self::Error> {
+        use std::io::Cursor;
+
+        use image::io::Reader as ImageReader;
+
+        let cursor = Cursor::new(body);
+        let img = ImageReader::new(cursor).with_guessed_format()?.decode()?;
+        Ok(img)
     }
 }
