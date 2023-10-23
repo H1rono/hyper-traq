@@ -10,8 +10,8 @@ use uuid::Uuid;
 
 use super::ApiRequest;
 use crate::models::{
-    Image, Message, Messages, PatchUserRequest, PostMessageRequest, User, UserStats, UserTags,
-    Users,
+    Image, Message, Messages, PatchUserRequest, PostMessageRequest, PutUserPasswordRequest, User,
+    UserStats, UserTags, Users,
 };
 
 #[derive(Debug, ThisError)]
@@ -440,6 +440,46 @@ impl ApiRequest for PutUserIcon {
             .write_to(&mut buf, ImageFormat::Png)
             .expect("failed to write image");
         buf.into_inner().into()
+    }
+
+    fn parse(&self, _body: Bytes) -> Result<Self::Response, Self::Error> {
+        Ok(())
+    }
+}
+
+/// maybe works
+#[derive(Debug, Clone)]
+pub struct PutUserPassword {
+    id: Uuid,
+    request: PutUserPasswordRequest,
+}
+
+impl PutUserPassword {
+    pub fn new(id: Uuid, request: PutUserPasswordRequest) -> Self {
+        Self { id, request }
+    }
+}
+
+impl ApiRequest for PutUserPassword {
+    type Response = ();
+    type Error = Error;
+
+    fn uri(&self) -> String {
+        format!("/users/{}/password", self.id)
+    }
+
+    fn method(&self) -> Method {
+        Method::PUT
+    }
+
+    fn content_type(&self) -> Option<String> {
+        Some("application/json".to_string())
+    }
+
+    fn body(&self) -> Body {
+        serde_json::to_string(&self.request)
+            .expect("failed to serialize PutUserPasswordRequest")
+            .into()
     }
 
     fn parse(&self, _body: Bytes) -> Result<Self::Response, Self::Error> {

@@ -120,3 +120,9 @@ pub struct UserStats {
 }
 
 pub type Image = DynamicImage;
+
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct PutUserPasswordRequest {
+    pub password: String,
+}
