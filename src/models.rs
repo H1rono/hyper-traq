@@ -139,3 +139,9 @@ pub struct PostUserRequest {
 pub struct PostUserTagRequest {
     pub tag: String,
 }
+
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct PatchUserTagRequest {
+    pub is_locked: bool,
+}

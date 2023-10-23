@@ -9,7 +9,11 @@ use thiserror::Error as ThisError;
 use uuid::Uuid;
 
 use super::ApiRequest;
-use crate::models::{Image, Message, Messages, PatchUserRequest, PostMessageRequest, PostUserRequest, PostUserTagRequest, PutUserPasswordRequest, User, UserDetail, UserStats, UserTags, Users, UserTag};
+use crate::models::{
+    Image, Message, Messages, PatchUserRequest, PatchUserTagRequest, PostMessageRequest,
+    PostUserRequest, PostUserTagRequest, PutUserPasswordRequest, User, UserDetail, UserStats,
+    UserTag, UserTags, Users,
+};
 
 #[derive(Debug, ThisError)]
 pub enum Error {
@@ -552,28 +556,73 @@ impl PostUserTag {
 impl ApiRequest for PostUserTag {
     type Response = UserTag;
     type Error = Error;
-    
+
     fn uri(&self) -> String {
         format!("/users/{}/tags", self.id)
     }
-    
+
     fn method(&self) -> Method {
         Method::POST
     }
-    
+
     fn content_type(&self) -> Option<String> {
         Some("application/json".to_string())
     }
-    
+
     fn body(&self) -> Body {
         serde_json::to_string(&self.request)
             .expect("failed to serialize PostUserTagRequest")
             .into()
     }
-    
+
     fn parse(&self, body: Bytes) -> Result<Self::Response, Self::Error> {
         let s = std::str::from_utf8(&body)?;
         let r = serde_json::from_str(s)?;
         Ok(r)
+    }
+}
+
+/// `PATCH /users/{user_id}/tags/{tag_id}`
+#[derive(Debug, Clone)]
+pub struct PatchUserTag {
+    user_id: Uuid,
+    tag_id: Uuid,
+    request: PatchUserTagRequest,
+}
+
+impl PatchUserTag {
+    pub fn new(user_id: Uuid, tag_id: Uuid, request: PatchUserTagRequest) -> Self {
+        Self {
+            user_id,
+            tag_id,
+            request,
+        }
+    }
+}
+
+impl ApiRequest for PatchUserTag {
+    type Response = ();
+    type Error = std::convert::Infallible;
+
+    fn uri(&self) -> String {
+        format!("/users/{}/tags/{}", self.user_id, self.tag_id)
+    }
+
+    fn method(&self) -> Method {
+        Method::PATCH
+    }
+
+    fn content_type(&self) -> Option<String> {
+        Some("application/json".to_string())
+    }
+
+    fn body(&self) -> Body {
+        serde_json::to_string(&self.request)
+            .expect("failed to serialize PatchUserTagRequest")
+            .into()
+    }
+
+    fn parse(&self, _body: Bytes) -> Result<Self::Response, Self::Error> {
+        Ok(())
     }
 }
