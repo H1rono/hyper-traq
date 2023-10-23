@@ -626,3 +626,37 @@ impl ApiRequest for PatchUserTag {
         Ok(())
     }
 }
+
+/// `DELETE /users/{user_id}/tags/{tag_id}`
+#[derive(Debug, Clone)]
+pub struct DeleteUserTag {
+    user_id: Uuid,
+    tag_id: Uuid,
+}
+
+impl DeleteUserTag {
+    pub fn new(user_id: Uuid, tag_id: Uuid) -> Self {
+        Self { user_id, tag_id }
+    }
+}
+
+impl ApiRequest for DeleteUserTag {
+    type Response = ();
+    type Error = std::convert::Infallible;
+
+    fn uri(&self) -> String {
+        format!("/users/{}/tags/{}", self.user_id, self.tag_id)
+    }
+
+    fn method(&self) -> Method {
+        Method::DELETE
+    }
+
+    fn body(&self) -> Body {
+        Body::empty()
+    }
+
+    fn parse(&self, _body: Bytes) -> Result<Self::Response, Self::Error> {
+        Ok(())
+    }
+}
