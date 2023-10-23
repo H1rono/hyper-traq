@@ -1,12 +1,15 @@
 use std::error::Error as StdError;
 use std::fmt::Debug;
 use std::future::Future;
+use std::io::Error as IoError;
 use std::pin::Pin;
+use std::str::Utf8Error;
 
 use hyper::body::Bytes;
 use hyper::http::StatusCode;
 use hyper::service::Service;
 use hyper::{Body, Method, Request};
+use image::ImageError;
 use thiserror::Error as ThisError;
 
 use crate::auth::Authorization;
@@ -90,4 +93,16 @@ where
         let s = self.clone();
         Box::pin(async move { s.request(req).await })
     }
+}
+
+#[derive(Debug, ThisError)]
+pub enum ApiError {
+    #[error(transparent)]
+    Io(#[from] IoError),
+    #[error(transparent)]
+    Utf8(#[from] Utf8Error),
+    #[error(transparent)]
+    Serde(#[from] serde_json::Error),
+    #[error(transparent)]
+    Image(#[from] ImageError),
 }

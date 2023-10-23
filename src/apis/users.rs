@@ -1,31 +1,18 @@
-use std::io::{Cursor, Error as IoError};
-use std::str::Utf8Error;
+use std::convert::Infallible;
+use std::io::Cursor;
 
 use hyper::body::Bytes;
 use hyper::{Body, Method};
-use image::{ImageError, ImageFormat};
+use image::ImageFormat;
 use itertools::Itertools;
-use thiserror::Error as ThisError;
 use uuid::Uuid;
 
-use super::ApiRequest;
+use super::{ApiError, ApiRequest};
 use crate::models::{
     DirectMessageChannel, Image, Message, Messages, PatchUserRequest, PatchUserTagRequest,
     PostMessageRequest, PostUserRequest, PostUserTagRequest, PutUserPasswordRequest, User,
     UserDetail, UserStats, UserTag, UserTags, Users,
 };
-
-#[derive(Debug, ThisError)]
-pub enum Error {
-    #[error(transparent)]
-    Io(#[from] IoError),
-    #[error(transparent)]
-    Utf8(#[from] Utf8Error),
-    #[error(transparent)]
-    Serde(#[from] serde_json::Error),
-    #[error(transparent)]
-    Image(#[from] ImageError),
-}
 
 /// `GET /users`
 #[derive(Debug, Clone, Default)]
@@ -45,7 +32,7 @@ impl GetUsers {
 
 impl ApiRequest for GetUsers {
     type Response = Users;
-    type Error = Error;
+    type Error = ApiError;
 
     fn uri(&self) -> String {
         let uri = format!("/users?include-suspended={}", self.include_suspended);
@@ -85,7 +72,7 @@ impl GetUser {
 
 impl ApiRequest for GetUser {
     type Response = User;
-    type Error = Error;
+    type Error = ApiError;
 
     fn uri(&self) -> String {
         format!("/users/{}", self.id)
@@ -120,7 +107,7 @@ impl GetUserTags {
 
 impl ApiRequest for GetUserTags {
     type Response = UserTags;
-    type Error = Error;
+    type Error = ApiError;
 
     fn uri(&self) -> String {
         format!("/users/{}/tags", self.id)
@@ -157,7 +144,7 @@ impl PatchUser {
 
 impl ApiRequest for PatchUser {
     type Response = ();
-    type Error = std::convert::Infallible;
+    type Error = Infallible;
 
     fn uri(&self) -> String {
         format!("/users/{}", self.id)
@@ -197,7 +184,7 @@ impl PostDirectMessage {
 
 impl ApiRequest for PostDirectMessage {
     type Response = Message;
-    type Error = Error;
+    type Error = ApiError;
 
     fn uri(&self) -> String {
         format!("/users/{}/messages", self.id)
@@ -294,7 +281,7 @@ impl GetDirectMessages {
 
 impl ApiRequest for GetDirectMessages {
     type Response = Messages;
-    type Error = Error;
+    type Error = ApiError;
 
     fn uri(&self) -> String {
         let mut query: Vec<(&str, String)> = vec![];
@@ -356,7 +343,7 @@ impl GetUserStats {
 
 impl ApiRequest for GetUserStats {
     type Response = UserStats;
-    type Error = Error;
+    type Error = ApiError;
 
     fn uri(&self) -> String {
         format!("/users/{}/stats", self.id)
@@ -391,7 +378,7 @@ impl GetUserIcon {
 
 impl ApiRequest for GetUserIcon {
     type Response = Image;
-    type Error = Error;
+    type Error = ApiError;
 
     fn uri(&self) -> String {
         format!("/users/{}/icon", self.id)
@@ -430,7 +417,7 @@ impl PutUserIcon {
 
 impl ApiRequest for PutUserIcon {
     type Response = ();
-    type Error = std::convert::Infallible;
+    type Error = Infallible;
 
     fn uri(&self) -> String {
         format!("/users/{}/icon", self.id)
@@ -473,7 +460,7 @@ impl PutUserPassword {
 
 impl ApiRequest for PutUserPassword {
     type Response = ();
-    type Error = Error;
+    type Error = Infallible;
 
     fn uri(&self) -> String {
         format!("/users/{}/password", self.id)
@@ -513,7 +500,7 @@ impl PostUser {
 
 impl ApiRequest for PostUser {
     type Response = UserDetail;
-    type Error = Error;
+    type Error = ApiError;
 
     fn uri(&self) -> String {
         "/users".to_string()
@@ -555,7 +542,7 @@ impl PostUserTag {
 
 impl ApiRequest for PostUserTag {
     type Response = UserTag;
-    type Error = Error;
+    type Error = ApiError;
 
     fn uri(&self) -> String {
         format!("/users/{}/tags", self.id)
@@ -602,7 +589,7 @@ impl PatchUserTag {
 
 impl ApiRequest for PatchUserTag {
     type Response = ();
-    type Error = std::convert::Infallible;
+    type Error = Infallible;
 
     fn uri(&self) -> String {
         format!("/users/{}/tags/{}", self.user_id, self.tag_id)
@@ -642,7 +629,7 @@ impl DeleteUserTag {
 
 impl ApiRequest for DeleteUserTag {
     type Response = ();
-    type Error = std::convert::Infallible;
+    type Error = Infallible;
 
     fn uri(&self) -> String {
         format!("/users/{}/tags/{}", self.user_id, self.tag_id)
@@ -675,7 +662,7 @@ impl GetDirectMessageChannel {
 
 impl ApiRequest for GetDirectMessageChannel {
     type Response = DirectMessageChannel;
-    type Error = Error;
+    type Error = ApiError;
 
     fn uri(&self) -> String {
         format!("/users/{}/dm-channel", self.id)
