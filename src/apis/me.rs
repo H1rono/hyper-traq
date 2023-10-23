@@ -2,7 +2,7 @@ use hyper::body::Bytes;
 use hyper::{Body, Method};
 
 use super::{ApiError, ApiRequest};
-use crate::models::StampHistoryEntries;
+use crate::models::{MyUserDetail, StampHistoryEntries};
 
 /// `GET /users/me/stamp-history`
 #[derive(Debug, Clone, Default)]
@@ -30,6 +30,39 @@ impl ApiRequest for GetMyStampHistory {
             return format!("/users/me/stamp-history?limit={}", limit);
         }
         "/users/me/stamp-history".to_string()
+    }
+
+    fn method(&self) -> Method {
+        Method::GET
+    }
+
+    fn body(&self) -> Body {
+        Body::empty()
+    }
+
+    fn parse(&self, body: Bytes) -> Result<Self::Response, Self::Error> {
+        let s = std::str::from_utf8(&body)?;
+        let v = serde_json::from_str(s)?;
+        Ok(v)
+    }
+}
+
+/// `GET /users/me`
+#[derive(Debug, Clone, Default)]
+pub struct GetMe;
+
+impl GetMe {
+    pub fn new() -> Self {
+        Default::default()
+    }
+}
+
+impl ApiRequest for GetMe {
+    type Response = MyUserDetail;
+    type Error = ApiError;
+
+    fn uri(&self) -> String {
+        "/users/me".to_string()
     }
 
     fn method(&self) -> Method {
