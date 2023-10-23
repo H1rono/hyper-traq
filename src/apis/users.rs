@@ -26,6 +26,7 @@ pub enum Error {
     Image(#[from] ImageError),
 }
 
+/// `GET /users`
 #[derive(Debug, Clone, Default)]
 pub struct GetUsers {
     pub include_suspended: bool,
@@ -69,6 +70,7 @@ impl ApiRequest for GetUsers {
     }
 }
 
+/// `GET /users/{id}`
 #[derive(Debug, Clone)]
 pub struct GetUser {
     id: Uuid,
@@ -103,6 +105,7 @@ impl ApiRequest for GetUser {
     }
 }
 
+/// `GET /users/{id}/tags`
 #[derive(Debug, Clone)]
 pub struct GetUserTags {
     id: Uuid,
@@ -137,6 +140,7 @@ impl ApiRequest for GetUserTags {
     }
 }
 
+/// `PATCH /users/{id}`
 /// maybe works
 #[derive(Debug, Clone)]
 pub struct PatchUser {
@@ -177,6 +181,7 @@ impl ApiRequest for PatchUser {
     }
 }
 
+/// `POST /users/{id}/messages`
 #[derive(Debug, Clone)]
 pub struct PostDirectMessage {
     id: Uuid,
@@ -218,6 +223,7 @@ impl ApiRequest for PostDirectMessage {
     }
 }
 
+/// `GET /users/{id}/messages`
 #[derive(Debug, Clone)]
 pub struct GetDirectMessages {
     id: Uuid,
@@ -335,6 +341,7 @@ impl ApiRequest for GetDirectMessages {
     }
 }
 
+/// `GET /users/{id}/stats`
 #[derive(Debug, Clone)]
 pub struct GetUserStats {
     id: Uuid,
@@ -369,6 +376,7 @@ impl ApiRequest for GetUserStats {
     }
 }
 
+/// `GET /users/{id}/icon`
 #[derive(Debug, Clone)]
 pub struct GetUserIcon {
     id: Uuid,
@@ -405,6 +413,7 @@ impl ApiRequest for GetUserIcon {
     }
 }
 
+/// `PUT /users/{id}/icon`
 /// maybe works
 #[derive(Debug, Clone)]
 pub struct PutUserIcon {
@@ -447,6 +456,7 @@ impl ApiRequest for PutUserIcon {
     }
 }
 
+/// `PUT /users/{id}/password`
 /// maybe works
 #[derive(Debug, Clone)]
 pub struct PutUserPassword {
@@ -487,6 +497,7 @@ impl ApiRequest for PutUserPassword {
     }
 }
 
+/// `POST /users`
 /// maybe works
 #[derive(Debug, Clone)]
 pub struct PostUser {
