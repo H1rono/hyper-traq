@@ -36,6 +36,10 @@ impl ApiRequest for GetMyStampHistory {
         Method::GET
     }
 
+    fn accept(&self) -> Option<String> {
+        Some("application/json".to_string())
+    }
+
     fn body(&self) -> Body {
         Body::empty()
     }
@@ -67,6 +71,10 @@ impl ApiRequest for GetMe {
 
     fn method(&self) -> Method {
         Method::GET
+    }
+
+    fn accept(&self) -> Option<String> {
+        Some("application/json".to_string())
     }
 
     fn body(&self) -> Body {

@@ -24,6 +24,9 @@ pub trait ApiRequest: Sync + Send + 'static {
 
     fn uri(&self) -> String;
     fn method(&self) -> Method;
+    fn accept(&self) -> Option<String> {
+        None
+    }
     fn content_type(&self) -> Option<String> {
         None
     }
@@ -48,7 +51,7 @@ impl Client {
     where
         Req: ApiRequest + Clone + Sync + Send + 'static,
     {
-        use hyper::header::AUTHORIZATION;
+        use hyper::header::{ACCEPT, AUTHORIZATION, CONTENT_TYPE};
         let uri = format!("{}{}", &self.base_path, req.uri());
         let req_builder = Request::builder().method(req.method()).uri(uri);
         let req_builder = if let Authorization::Bearer(bearer) = &self.authorization {
@@ -56,8 +59,12 @@ impl Client {
         } else {
             req_builder
         };
+        let req_builder = if let Some(accept) = req.accept() {
+            req_builder.header(ACCEPT, accept)
+        } else {
+            req_builder
+        };
         let req_builder = if let Some(content_type) = req.content_type() {
-            use hyper::header::CONTENT_TYPE;
             req_builder.header(CONTENT_TYPE, content_type)
         } else {
             req_builder

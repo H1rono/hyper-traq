@@ -47,6 +47,10 @@ impl ApiRequest for GetUsers {
         Method::GET
     }
 
+    fn accept(&self) -> Option<String> {
+        Some("application/json".to_string())
+    }
+
     fn body(&self) -> Body {
         Body::empty()
     }
@@ -82,6 +86,10 @@ impl ApiRequest for GetUser {
         Method::GET
     }
 
+    fn accept(&self) -> Option<String> {
+        Some("application/json".to_string())
+    }
+
     fn body(&self) -> Body {
         Body::empty()
     }
@@ -115,6 +123,10 @@ impl ApiRequest for GetUserTags {
 
     fn method(&self) -> Method {
         Method::GET
+    }
+
+    fn accept(&self) -> Option<String> {
+        Some("application/json".to_string())
     }
 
     fn body(&self) -> Body {
@@ -192,6 +204,10 @@ impl ApiRequest for PostDirectMessage {
 
     fn method(&self) -> Method {
         Method::POST
+    }
+
+    fn accept(&self) -> Option<String> {
+        Some("application/json".to_string())
     }
 
     fn content_type(&self) -> Option<String> {
@@ -318,6 +334,10 @@ impl ApiRequest for GetDirectMessages {
         Method::GET
     }
 
+    fn accept(&self) -> Option<String> {
+        Some("application/json".to_string())
+    }
+
     fn body(&self) -> Body {
         Body::empty()
     }
@@ -353,6 +373,10 @@ impl ApiRequest for GetUserStats {
         Method::GET
     }
 
+    fn accept(&self) -> Option<String> {
+        Some("application/json".to_string())
+    }
+
     fn body(&self) -> Body {
         Body::empty()
     }
@@ -386,6 +410,10 @@ impl ApiRequest for GetUserIcon {
 
     fn method(&self) -> Method {
         Method::GET
+    }
+
+    fn accept(&self) -> Option<String> {
+        Some("image/jpeg, image/png, image/gif".to_string())
     }
 
     fn body(&self) -> Body {
@@ -510,6 +538,10 @@ impl ApiRequest for PostUser {
         Method::POST
     }
 
+    fn accept(&self) -> Option<String> {
+        Some("application/json".to_string())
+    }
+
     fn content_type(&self) -> Option<String> {
         Some("application/json".to_string())
     }
@@ -550,6 +582,10 @@ impl ApiRequest for PostUserTag {
 
     fn method(&self) -> Method {
         Method::POST
+    }
+
+    fn accept(&self) -> Option<String> {
+        Some("application/json".to_string())
     }
 
     fn content_type(&self) -> Option<String> {
@@ -670,6 +706,10 @@ impl ApiRequest for GetDirectMessageChannel {
 
     fn method(&self) -> Method {
         Method::GET
+    }
+
+    fn accept(&self) -> Option<String> {
+        Some("application/json".to_string())
     }
 
     fn body(&self) -> Body {
