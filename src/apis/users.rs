@@ -1,9 +1,9 @@
-use std::io::Error as IoError;
+use std::io::{Cursor, Error as IoError};
 use std::str::Utf8Error;
 
 use hyper::body::Bytes;
 use hyper::{Body, Method};
-use image::ImageError;
+use image::{ImageError, ImageFormat};
 use itertools::Itertools;
 use thiserror::Error as ThisError;
 use uuid::Uuid;
@@ -397,12 +397,52 @@ impl ApiRequest for GetUserIcon {
     }
 
     fn parse(&self, body: Bytes) -> Result<Self::Response, Self::Error> {
-        use std::io::Cursor;
-
         use image::io::Reader as ImageReader;
 
         let cursor = Cursor::new(body);
         let img = ImageReader::new(cursor).with_guessed_format()?.decode()?;
         Ok(img)
+    }
+}
+
+/// maybe works
+#[derive(Debug, Clone)]
+pub struct PutUserIcon {
+    id: Uuid,
+    request: Image,
+}
+
+impl PutUserIcon {
+    pub fn new(id: Uuid, request: Image) -> Self {
+        Self { id, request }
+    }
+}
+
+impl ApiRequest for PutUserIcon {
+    type Response = ();
+    type Error = std::convert::Infallible;
+
+    fn uri(&self) -> String {
+        format!("/users/{}/icon", self.id)
+    }
+
+    fn method(&self) -> Method {
+        Method::PUT
+    }
+
+    fn content_type(&self) -> Option<String> {
+        Some("image/png".to_string())
+    }
+
+    fn body(&self) -> Body {
+        let mut buf = Cursor::new(Vec::new());
+        self.request
+            .write_to(&mut buf, ImageFormat::Png)
+            .expect("failed to write image");
+        buf.into_inner().into()
+    }
+
+    fn parse(&self, _body: Bytes) -> Result<Self::Response, Self::Error> {
+        Ok(())
     }
 }
