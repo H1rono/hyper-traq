@@ -145,3 +145,10 @@ pub struct PostUserTagRequest {
 pub struct PatchUserTagRequest {
     pub is_locked: bool,
 }
+
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct DirectMessageChannel {
+    pub id: Uuid,
+    pub user_id: Uuid,
+}

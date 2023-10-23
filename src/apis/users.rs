@@ -10,9 +10,9 @@ use uuid::Uuid;
 
 use super::ApiRequest;
 use crate::models::{
-    Image, Message, Messages, PatchUserRequest, PatchUserTagRequest, PostMessageRequest,
-    PostUserRequest, PostUserTagRequest, PutUserPasswordRequest, User, UserDetail, UserStats,
-    UserTag, UserTags, Users,
+    DirectMessageChannel, Image, Message, Messages, PatchUserRequest, PatchUserTagRequest,
+    PostMessageRequest, PostUserRequest, PostUserTagRequest, PutUserPasswordRequest, User,
+    UserDetail, UserStats, UserTag, UserTags, Users,
 };
 
 #[derive(Debug, ThisError)]
@@ -658,5 +658,40 @@ impl ApiRequest for DeleteUserTag {
 
     fn parse(&self, _body: Bytes) -> Result<Self::Response, Self::Error> {
         Ok(())
+    }
+}
+
+/// `GET /users/{id}/dm-channel`
+#[derive(Debug, Clone)]
+pub struct GetDirectMessageChannel {
+    id: Uuid,
+}
+
+impl GetDirectMessageChannel {
+    pub fn new(id: Uuid) -> Self {
+        Self { id }
+    }
+}
+
+impl ApiRequest for GetDirectMessageChannel {
+    type Response = DirectMessageChannel;
+    type Error = Error;
+
+    fn uri(&self) -> String {
+        format!("/users/{}/dm-channel", self.id)
+    }
+
+    fn method(&self) -> Method {
+        Method::GET
+    }
+
+    fn body(&self) -> Body {
+        Body::empty()
+    }
+
+    fn parse(&self, body: Bytes) -> Result<Self::Response, Self::Error> {
+        let s = std::str::from_utf8(&body)?;
+        let r = serde_json::from_str(s)?;
+        Ok(r)
     }
 }
