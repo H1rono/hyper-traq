@@ -9,10 +9,7 @@ use thiserror::Error as ThisError;
 use uuid::Uuid;
 
 use super::ApiRequest;
-use crate::models::{
-    Image, Message, Messages, PatchUserRequest, PostMessageRequest, PostUserRequest,
-    PutUserPasswordRequest, User, UserDetail, UserStats, UserTags, Users,
-};
+use crate::models::{Image, Message, Messages, PatchUserRequest, PostMessageRequest, PostUserRequest, PostUserTagRequest, PutUserPasswordRequest, User, UserDetail, UserStats, UserTags, Users, UserTag};
 
 #[derive(Debug, ThisError)]
 pub enum Error {
@@ -532,6 +529,48 @@ impl ApiRequest for PostUser {
             .into()
     }
 
+    fn parse(&self, body: Bytes) -> Result<Self::Response, Self::Error> {
+        let s = std::str::from_utf8(&body)?;
+        let r = serde_json::from_str(s)?;
+        Ok(r)
+    }
+}
+
+/// `POST /users/{id}/tags`
+#[derive(Debug, Clone)]
+pub struct PostUserTag {
+    id: Uuid,
+    request: PostUserTagRequest,
+}
+
+impl PostUserTag {
+    pub fn new(id: Uuid, request: PostUserTagRequest) -> Self {
+        Self { id, request }
+    }
+}
+
+impl ApiRequest for PostUserTag {
+    type Response = UserTag;
+    type Error = Error;
+    
+    fn uri(&self) -> String {
+        format!("/users/{}/tags", self.id)
+    }
+    
+    fn method(&self) -> Method {
+        Method::POST
+    }
+    
+    fn content_type(&self) -> Option<String> {
+        Some("application/json".to_string())
+    }
+    
+    fn body(&self) -> Body {
+        serde_json::to_string(&self.request)
+            .expect("failed to serialize PostUserTagRequest")
+            .into()
+    }
+    
     fn parse(&self, body: Bytes) -> Result<Self::Response, Self::Error> {
         let s = std::str::from_utf8(&body)?;
         let r = serde_json::from_str(s)?;
