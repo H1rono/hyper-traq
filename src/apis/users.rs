@@ -10,8 +10,8 @@ use uuid::Uuid;
 
 use super::ApiRequest;
 use crate::models::{
-    Image, Message, Messages, PatchUserRequest, PostMessageRequest, PutUserPasswordRequest, User,
-    UserStats, UserTags, Users,
+    Image, Message, Messages, PatchUserRequest, PostMessageRequest, PostUserRequest,
+    PutUserPasswordRequest, User, UserDetail, UserStats, UserTags, Users,
 };
 
 #[derive(Debug, ThisError)]
@@ -484,5 +484,46 @@ impl ApiRequest for PutUserPassword {
 
     fn parse(&self, _body: Bytes) -> Result<Self::Response, Self::Error> {
         Ok(())
+    }
+}
+
+/// maybe works
+#[derive(Debug, Clone)]
+pub struct PostUser {
+    request: PostUserRequest,
+}
+
+impl PostUser {
+    pub fn new(request: PostUserRequest) -> Self {
+        Self { request }
+    }
+}
+
+impl ApiRequest for PostUser {
+    type Response = UserDetail;
+    type Error = Error;
+
+    fn uri(&self) -> String {
+        "/users".to_string()
+    }
+
+    fn method(&self) -> Method {
+        Method::POST
+    }
+
+    fn content_type(&self) -> Option<String> {
+        Some("application/json".to_string())
+    }
+
+    fn body(&self) -> Body {
+        serde_json::to_string(&self.request)
+            .expect("failed to serialize PostUserRequest")
+            .into()
+    }
+
+    fn parse(&self, body: Bytes) -> Result<Self::Response, Self::Error> {
+        let s = std::str::from_utf8(&body)?;
+        let r = serde_json::from_str(s)?;
+        Ok(r)
     }
 }
