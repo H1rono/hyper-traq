@@ -152,3 +152,12 @@ pub struct DirectMessageChannel {
     pub id: Uuid,
     pub user_id: Uuid,
 }
+
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct StampHistoryEntry {
+    pub stamp_id: Uuid,
+    pub datetime: String,
+}
+
+pub type StampHistoryEntries = Vec<StampHistoryEntry>;

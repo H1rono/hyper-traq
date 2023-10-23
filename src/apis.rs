@@ -15,6 +15,7 @@ use thiserror::Error as ThisError;
 use crate::auth::Authorization;
 use crate::client::Client;
 
+pub mod me;
 pub mod users;
 
 pub trait ApiRequest: Sync + Send + 'static {
