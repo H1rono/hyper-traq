@@ -162,6 +162,28 @@ pub struct StampHistoryEntry {
 
 pub type StampHistoryEntries = Vec<StampHistoryEntry>;
 
+#[derive(Debug, Clone)]
+pub enum QrCode {
+    Image(Image),
+    Text(String),
+}
+
+impl QrCode {
+    pub fn image(self) -> Option<Image> {
+        match self {
+            Self::Image(image) => Some(image),
+            Self::Text(_) => None,
+        }
+    }
+
+    pub fn text(self) -> Option<String> {
+        match self {
+            Self::Image(_) => None,
+            Self::Text(text) => Some(text),
+        }
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 #[serde(rename_all = "snake_case")]
 pub enum UserPermission {

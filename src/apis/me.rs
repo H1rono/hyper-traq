@@ -1,8 +1,10 @@
+use std::io::Cursor;
+
 use hyper::body::Bytes;
 use hyper::{Body, Method};
 
 use super::{ApiError, ApiRequest};
-use crate::models::{MyUserDetail, StampHistoryEntries};
+use crate::models::{MyUserDetail, QrCode, StampHistoryEntries};
 
 /// `GET /users/me/stamp-history`
 #[derive(Debug, Clone, Default)]
@@ -48,6 +50,64 @@ impl ApiRequest for GetMyStampHistory {
         let s = std::str::from_utf8(&body)?;
         let v = serde_json::from_str(s)?;
         Ok(v)
+    }
+}
+
+/// `GET /users/me/qr-code`
+#[derive(Debug, Clone, Copy, Default)]
+pub struct GetMyQrCode {
+    token: bool,
+}
+
+impl GetMyQrCode {
+    pub fn new() -> Self {
+        Default::default()
+    }
+
+    pub fn token(self, token: bool) -> Self {
+        Self { token }
+    }
+}
+
+impl ApiRequest for GetMyQrCode {
+    type Response = QrCode;
+    type Error = ApiError;
+
+    fn uri(&self) -> String {
+        if self.token {
+            return "/users/me/qr-code?token=true".to_string();
+        }
+        "/users/me/qr-code".to_string()
+    }
+
+    fn method(&self) -> Method {
+        Method::GET
+    }
+
+    fn accept(&self) -> Option<String> {
+        let s = if self.token {
+            "text/plain"
+        } else {
+            "image/png"
+        };
+        Some(s.to_string())
+    }
+
+    fn body(&self) -> Body {
+        Body::empty()
+    }
+
+    fn parse(&self, body: Bytes) -> Result<Self::Response, Self::Error> {
+        if self.token {
+            let s = std::str::from_utf8(&body)?;
+            Ok(QrCode::Text(s.to_string()))
+        } else {
+            use image::io::Reader as ImageReader;
+
+            let cursor = Cursor::new(body);
+            let img = ImageReader::new(cursor).with_guessed_format()?.decode()?;
+            Ok(QrCode::Image(img))
+        }
     }
 }
 
