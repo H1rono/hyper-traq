@@ -26,9 +26,7 @@
           rustc = toolchain;
           cargo = toolchain;
         };
-      in
-      {
-        packages.default = rustPlatform.buildRustPackage {
+        commonArgs = {
           pname = "hyper-traq";
           version = "0.1.0";
           src = ./.;
@@ -41,7 +39,18 @@
             libiconv
             darwin.Security
           ];
+          doCheck = false;
         };
+      in
+      {
+        packages.default = rustPlatform.buildRustPackage commonArgs;
+        checks.cargo = rustPlatform.buildRustPackage (commonArgs // {
+          doCheck = true;
+          checkPhase = ''
+            cargo fmt --all -- --check
+            cargo clippy -- -D warnings
+          '';
+        });
         devShells.default = pkgs.mkShell {
           packages = with pkgs; [
             toolchain
