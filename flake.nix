@@ -1,4 +1,6 @@
 {
+  description = "hyper-powered traQ client library";
+
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/release-23.11";
     flake-utils.url = "github:numtide/flake-utils";
@@ -20,10 +22,35 @@
           file = ./rust-toolchain.toml;
           sha256 = "sha256-7QfkHty6hSrgNM0fspycYkRcB82eEqYa4CoAJ9qA3tU=";
         };
+        rustPlatform = pkgs.makeRustPlatform {
+          rustc = toolchain;
+          cargo = toolchain;
+        };
       in
       {
+        packages.default = rustPlatform.buildRustPackage {
+          pname = "hyper-traq";
+          version = "0.1.0";
+          src = ./.;
+          cargoLock.lockFile = ./Cargo.lock;
+          buildType = "debug";
+          nativeBuildInputs = [ pkgs.pkg-config ];
+          buildInputs = with pkgs; [
+            openssl
+          ] ++ lib.optionals stdenv.isDarwin [
+            libiconv
+            darwin.Security
+          ];
+        };
         devShells.default = pkgs.mkShell {
-          packages = [ toolchain ];
+          packages = with pkgs; [
+            toolchain
+            pkg-config
+            openssl
+          ] ++ lib.optionals stdenv.isDarwin [
+            libiconv
+            darwin.Security
+          ];
         };
       }
     );
